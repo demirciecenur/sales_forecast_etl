@@ -1,4 +1,3 @@
-
 import pandas as pd
 import logging
 from pathlib import Path
@@ -30,18 +29,18 @@ class DataExtractor:
         )
 
     def _read_csv(self, file_path: Path, **kwargs) -> Optional[pd.DataFrame]:
-        """Read CSV file with multiple encoding attempts"""
-        encodings = ['utf-8', 'latin1', 'iso-8859-1', 'cp1252']
+        """Try different encodings becuse of excel export problems"""
+        encodings = ['utf-8', 'latin1', 'iso-8859-1', 'cp1252'] 
         
-        for encoding in encodings:
+        for enc in encodings:
             try:
-                df = pd.read_csv(file_path, encoding=encoding, **kwargs)
-                logging.info(f"Successfully read CSV file: {file_path} with {encoding} encoding")
+                df = pd.read_csv(file_path, encoding=enc, **kwargs)
+                logging.info(f"Read CSV file: {file_path} with {enc}")
                 return df
             except UnicodeDecodeError:
-                continue
+                continue # try next encoding
             except Exception as e:
-                logging.error(f"Error reading CSV {file_path} with {encoding}: {e}")
+                logging.error(f"Error reading CSV {file_path} with {enc}: {e}")
                 continue
         
         logging.error(f"Failed to read CSV with any encoding: {file_path}")

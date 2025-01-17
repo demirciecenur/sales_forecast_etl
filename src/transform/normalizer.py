@@ -1,4 +1,3 @@
-
 import pandas as pd
 import logging
 from typing import Optional
@@ -8,9 +7,19 @@ class DataNormalizer:
         self.business_rules = business_rules or {}
 
     def normalize_sales_data(self, df: pd.DataFrame, file_path: str = None) -> pd.DataFrame:
-        """Normalize sales data to match database schema"""
+        """Fix data problems and standartize format"""
         try:
-            normalized_df = df.copy()
+            # Make copy to avoid changing original
+            norm_df = df.copy()
+            
+            # Fix column names - they are always different :(
+            col_map = {
+                'MATERIAL': 'material_number',  # why do they use different names??
+                'MATERIAL_NO': 'material_number',
+                'MATERIAL_NUMBER': 'material_number',
+                'SALES_GROSS': 'gross_sales', 
+                'SALES_NET': 'net_sales'
+            }
             
             # Column mapping
             column_mapping = {
@@ -22,17 +31,17 @@ class DataNormalizer:
             }
             
             # Rename columns
-            normalized_df = normalized_df.rename(columns=column_mapping)
+            norm_df = norm_df.rename(columns=column_mapping)
             
             # Map region codes based on file path
             if file_path:
                 file_path = file_path.lower()
                 if 'asia' in file_path:
-                    normalized_df['region_code'] = '4'  # Asia Pacific
+                    norm_df['region_code'] = '4'  # Asia Pacific
                 elif 'emea' in file_path:
-                    normalized_df['region_code'] = '1'  # EMEA
+                    norm_df['region_code'] = '1'  # EMEA
                 elif 'americas' in file_path:
-                    normalized_df['region_code'] = '2'  # Americas
+                    norm_df['region_code'] = '2'  # Americas
                 else:
                     # Use existing mapping for unknown sources
                     region_mapping = {
@@ -41,12 +50,12 @@ class DataNormalizer:
                         '2': '2',  # Americas
                         '4': '4'   # Asia Pacific
                     }
-                    normalized_df['region_code'] = normalized_df['region_code'].astype(str).map(region_mapping)
+                    norm_df['region_code'] = norm_df['region_code'].astype(str).map(region_mapping)
             
             # Data type conversions
-            normalized_df['period'] = normalized_df['period'].astype(str).str.replace('.', '')
-            normalized_df['year'] = normalized_df['period'].str[:4].astype(int)
-            normalized_df['material_number'] = normalized_df['material_number'].astype(str).str.strip()
+            norm_df['period'] = norm_df['period'].astype(str).str.replace('.', '')
+            norm_df['year'] = norm_df['period'].str[:4].astype(int)
+            norm_df['material_number'] = norm_df['material_number'].astype(str).str.strip()
             
             # Select final columns
             final_columns = [
@@ -54,7 +63,7 @@ class DataNormalizer:
                 'net_sales', 'region_code', 'year'
             ]
             
-            return normalized_df[final_columns]
+            return norm_df[final_columns]
 
         except Exception as e:
             logging.error(f"Error normalizing sales data: {str(e)}")

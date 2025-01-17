@@ -44,36 +44,30 @@ class DataValidator:
         )
 
     def validate_sales_data(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Validate sales data and return valid records"""
+        """Validate sales data"""
         try:
-            valid_df = df.copy()
-            total_rows = len(valid_df)
-            
-            # Check required columns
-            missing_cols = [col for col in self.required_columns['sales'] 
-                          if col not in valid_df.columns]
-            if missing_cols:
-                logging.error(f"Missing required columns in sales data: {missing_cols}")
-                logging.info(f"Available columns: {valid_df.columns.tolist()}")
+            if df.empty:
                 return pd.DataFrame()
-
-            # Remove rows with missing required fields
-            required_fields_mask = valid_df[self.required_columns['sales']].notna().all(axis=1)
-            valid_df = valid_df[required_fields_mask]
             
-            if len(valid_df) < total_rows:
-                logging.info(f"Removed {total_rows - len(valid_df)} rows with missing required fields")
-
-            # Business rules validation
-            valid_df = self._validate_business_rules(valid_df)
+            # Required fields check
+            required_fields = ['PERIOD', 'MATERIAL_NBR', 'GROSS_SALES', 'NET_SALES', 'REGION_CODE']
+            if not all(field in df.columns for field in required_fields):
+                logging.error(f"Missing required fields. Found: {df.columns.tolist()}")
+                return pd.DataFrame()
             
-            if not valid_df.empty:
-                logging.info(f"Validated {len(valid_df)} sales records successfully")
+            # Remove rows with missing values
+            valid_df = df.dropna(subset=required_fields)
+            
+            # Business rule: NET_SALES <= GROSS_SALES
+            invalid_sales = valid_df[valid_df['NET_SALES'] > valid_df['GROSS_SALES']]
+            if not invalid_sales.empty:
+                logging.warning(f"Found {len(invalid_sales)} records with NET_SALES > GROSS_SALES")
+                valid_df = valid_df[~valid_df.index.isin(invalid_sales.index)]
             
             return valid_df
-
+        
         except Exception as e:
-            logging.error(f"Sales data validation error: {str(e)}")
+            logging.error(f"Error validating sales data: {str(e)}")
             return pd.DataFrame()
 
     def _validate_numeric_columns(self, df: pd.DataFrame) -> pd.DataFrame:

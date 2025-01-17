@@ -6,9 +6,14 @@
 
 The company's sales and forecasting teams work with separate Excel files, each maintaining their own format. The challenge is to create a unified, quality-assured database that serves as the backend for a web application comparing sales against forecasts.
 
-### Technical Solution
+For detailed documentation:
 
-Our solution implements a robust ETL pipeline following Data Engineering best practices:
+- [Data Quality Rules](docs/data_quality.md)
+- [Database Schema](docs/ER_diyagram_.png)
+- [Automation Process](docs/automation.md)
+- [Business Decisions](docs/decisions.md)
+
+### Technical Solution
 
 #### 1. Data Architecture
 
@@ -16,59 +21,41 @@ Our solution implements a robust ETL pipeline following Data Engineering best pr
 
   - Fact tables: fact_sales, fact_forecast
   - Dimension tables: dim_material, dim_time, dim_region
-  - Why? Optimizes for analytical queries and maintains data integrity
-
-- **SOLID Principles in Data Engineering**:
-  - Single Responsibility: Each component handles one aspect (extraction, validation, transformation)
-  - Open/Closed: New data quality rules can be added without modifying existing code
-  - Interface Segregation: Clear separation between data loading and processing
-  - Dependency Inversion: High-level modules don't depend on low-level modules
 
 #### 2. Data Quality Framework
 
-- **Validation Layers**:
-  - Schema validation (required columns, data types)
+- **Validation Rules**:
+
+  - Required fields validation
   - Business rule validation (e.g., net sales ≤ gross sales)
-  - Cross-reference validation (material numbers consistency)
-- **Quality Metrics**:
-  - Completeness: Missing value detection
-  - Accuracy: Value range checks
-  - Consistency: Cross-reference validation
-  - Timeliness: Period validation
+  - Material number standardization (8-digit format)
+  - Region code validation (1=EMEA, 2=Americas, 4=Asia)
 
-#### 3. ETL Process
+- **Error Handling**:
+  - Invalid record removal
+  - Detailed error logging
+  - Data quality reporting
 
-```mermaid
-graph LR
-    A[Excel Files] --> B[Data Extraction]
-    B --> C[Quality Validation]
-    C --> D[Transformation]
-    D --> E[Loading to DWH]
-```
+#### 3. Data Standardization
 
-#### 4. Performance Considerations
+- **Material Numbers**:
+  - 8-digit format
+  - Leading zero padding
+  - Decimal point removal
+- **Time Periods**:
 
-- Incremental loading capability
-- Optimized SQL schema with proper indexing
-- Efficient data type handling
-- Parallel processing where applicable
+  - YYYY.MM format
+  - Year extraction
+  - Period validation
+
+- **Region Codes**:
+  - Standardized mapping
+  - File-based assignment
+  - Validation rules
 
 ## Technical Implementation
 
 ### Directory Structure
-
-```
-project/
-├── config/
-│   ├── dev.txt         # Environment-specific configurations
-│   └── data_types.yaml # Data validation rules
-├── src/
-│   ├── extract/        # Data extraction modules
-│   ├── transform/      # Transformation logic
-│   └── quality/        # Data quality framework
-├── tests/              # Unit and integration tests
-└── sql/               # Database schema and views
-```
 
 ### Key Components
 
@@ -128,10 +115,6 @@ python main.py
 
 2. **Integration Tests**
 
-   - End-to-end pipeline testing
-   - Database integration testing
-   - Performance testing
-
 3. **Quality Assurance**
    - Data quality metrics
    - Business rule validation
@@ -149,24 +132,3 @@ python main.py
    - Data quality dashboards
    - Validation rule monitoring
    - Error rate tracking
-
-## Future Enhancements
-
-1. **Scalability**
-
-   - Parallel processing implementation
-   - Distributed computing capability
-   - Cloud integration readiness
-
-2. **Additional Features**
-   - Real-time data processing
-   - Advanced data quality rules
-   - Machine learning-based anomaly detection
-
-## Documentation
-
-- [Database Schema](docs/schema.md)
-- [API Documentation](docs/api.md)
-- [Quality Rules](docs/quality_rules.md)
-
-![alt text](image.png)

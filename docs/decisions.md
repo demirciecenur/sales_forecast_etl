@@ -4,14 +4,6 @@
 
 ### Material Numbers
 
-```python
-def _standardize_material_number(self, value: any) -> str:
-    """Standardize material number format"""
-    clean_value = str(value).replace('.0', '')
-    clean_value = ''.join(filter(str.isdigit, clean_value))
-    return clean_value.zfill(8)  # Pad with leading zeros
-```
-
 - **Decision**: Standardize to 8-digit format
 - **Rationale**: Ensures consistency across regions
 - **Reference**: src/database/loader.py:\_standardize_material_number
@@ -41,6 +33,6 @@ CREATE TABLE dim_time (
    - **Reference**: src/quality/validator.py:\_validate_business_rules
 
 2. Sales Validation
-   - NET_SALES ≤ GROSS_SALES (with 1% tolerance)
+   - NET_SALES ≤ GROSS_SALES
    - **Rationale**: Business logic requirement
    - **Reference**: src/quality/validator.py:\_validate_business_rules

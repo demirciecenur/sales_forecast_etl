@@ -1,4 +1,3 @@
-
 import pandas as pd
 import sqlite3
 import logging
@@ -67,17 +66,17 @@ class DatabaseLoader:
             return False
 
     def _standardize_material_number(self, value: any) -> str:
-        """Standardize material number format"""
+        """Try to fix material numbers - they are never consistent"""
         try:
-            # Remove any non-numeric characters and decimal points
-            clean_value = str(value).replace('.0', '')
-            clean_value = ''.join(filter(str.isdigit, clean_value))
+            # Remove decimal points etc
+            clean_val = str(value).replace('.0', '')
+            clean_val = ''.join(filter(str.isdigit, clean_val))
             
-            # Validate length
-            if len(clean_value) > 0:
-                if len(clean_value) > 8:
-                    clean_value = clean_value[:8]  # Truncate if too long
-                return clean_value.zfill(8)  # Pad with leading zeros
+            # Should be 8 digits
+            if len(clean_val) > 0:
+                if len(clean_val) > 8:
+                    clean_val = clean_val[:8]  # too long, cut it
+                return clean_val.zfill(8)  # add zeros if needed
             
             logging.warning(f"Invalid material number format: {value}")
             return str(value)
