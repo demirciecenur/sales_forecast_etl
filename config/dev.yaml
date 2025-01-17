@@ -1,0 +1,29 @@
+database:
+  path: "data/sales_forecast.db"
+
+business_rules:
+  sales:
+    min_gross_sales: 0
+    min_net_sales: 0
+    allow_net_greater_than_gross: false
+    
+input_files:
+  sales:
+    americas: "data/raw/americas.csv"
+    emea: "data/raw/emea.csv" 
+    asia: "data/raw/asia.xlsx"
+  forecast: "data/raw/forecast.csv"
+
+region_mapping:
+  EMEA:
+    code: "1"
+    name: "Europe, Middle East and Africa"
+  NAM:
+    code: "2"
+    name: "North America"
+  SAM:
+    code: "2"
+    name: "South America"
+  ASIA:
+    code: "4"
+    name: "Asia Pacific" 

@@ -1,0 +1,15 @@
+# Data files
+data/raw/*
+data/final/*
+*.xlsx
+*.csv
+*.db
+*.sqlite
+.DS_Store
+!data/raw/.gitkeep
+!data/final/.gitkeep
+.pytest_cache/
+logs/
+__pycache__/
+.idea/
+venv/

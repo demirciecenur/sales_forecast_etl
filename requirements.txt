@@ -1,0 +1,11 @@
+# Core dependencies
+pandas>=1.3.0
+openpyxl>=3.0.0  # Excel support
+sqlalchemy>=1.4.0  # Database operations
+
+# Testing
+pytest>=6.0.0
+pytest-cov>=2.12.0
+
+# Type checking
+mypy>=0.910
